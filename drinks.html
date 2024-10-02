@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Lagmani - Sho'rvalar</title>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Sho'rvalar</h1>
+            <button onclick="goBack()">Ortga qaytish</button>
+        </header>
+
+        <div class="products">
+            <div class="product">
+                <img src="soup1.jpg" alt="Sho'rva 1">
+                <h3>Sho'rva 1</h3>
+                <p>Narxi: 20,000 so'm</p>
+            </div>
+            <div class="product">
+                <img src="soup2.jpg" alt="Sho'rva 2">
+                <h3>Sho'rva 2</h3>
+                <p>Narxi: 25,000 so'm</p>
+            </div>
+            <!-- Qo'shimcha mahsulotlar -->
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>
