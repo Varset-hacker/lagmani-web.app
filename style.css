@@ -4,6 +4,7 @@ body {
     padding: 0;
     background-image: url('https://pikfon.com/api/img/w900/1d/1d6d3e0c777fc4fb0b2246c65f9ea48f.jpg'); /* O'zgartiring */
     background-size: cover;
+    background-size: 1500px;
     background-repeat: no-repeat;
     color: #333;
 }
