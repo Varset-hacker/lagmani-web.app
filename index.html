@@ -5,115 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lagmani Restaurant</title>
     <link rel="stylesheet" href="style.css">
+    <script defer src="script.js"></script>
 </head>
 <body>
-    <div id="loader">
-        <div class="loader"></div>
-        <p>Yuklanmoqda, iltimos kuting...</p>
+    <!-- Loading animatsiyasi -->
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <p class="loading-text">Yuklanmoqda...</p>
     </div>
 
-    <div class="container" style="display: none;">
+    <!-- Stol tanlash qismi -->
+    <div id="table-selection" class="hidden">
+        <h1>Stolni tanlang</h1>
+        <select id="table-select">
+            <option value="" disabled selected>Stol raqamini tanlang</option>
+            <!-- 1-80 gacha stol raqamlari -->
+            <script>
+                for (let i = 1; i <= 80; i++) {
+                    document.write(`<option value="${i}">${i}-stol</option>`);
+                }
+            </script>
+        </select>
+        <button id="select-table">Davom etish</button>
+    </div>
+
+    <!-- Asosiy sahifa (kategoriya va mahsulotlar) -->
+    <div id="main-content" class="hidden">
         <header>
-            <h1>Lagmani Restaurant Menyusi</h1>
-            <nav>
-                <ul>
-                    <li><a href="#" onclick="showSection('food')">Yeguliklar</a></li>
-                    <li><a href="#" onclick="showSection('drinks')">Ichimliklar</a></li>
-                    <li><a href="#" onclick="showSection('fast_food')">Fast Food</a></li>
-                    <li><a href="#" onclick="showSection('national_food')">Milliy Taomlar</a></li>
-                    <li><a href="#" onclick="showSection('alcohol')">Spirtli Ichimliklar</a></li>
-                </ul>
-            </nav>
+            <div class="logo">
+                <img src="lagmani-logo.png" alt="Lagmani Logo">
+                <h1>Lagmani</h1>
+            </div>
+            <div class="language-switcher">
+                <button id="uzbek-lang">UZ</button>
+                <button id="english-lang">EN</button>
+                <button id="russian-lang">RU</button>
+            </div>
         </header>
 
-        <main>
-            <div id="food" class="section">
-                <h2>Yeguliklar</h2>
-                <div class="product">
-                    <img src="food1.jpg" alt="Yegulik 1">
-                    <h3>Palov</h3>
-                    <p>Narxi: 25,000 UZS</p>
-                    <button onclick="addToCart('Palov')">Korzinkaga qo'shish</button>
-                </div>
-            </div>
+        <nav class="categories">
+            <button class="category" data-category="salatlar">Salatlar</button>
+            <button class="category" data-category="ichimliklar">Ichimliklar</button>
+            <button class="category" data-category="asosiy-taomlar">Asosiy taomlar</button>
+            <!-- Yana kategoriyalar -->
+        </nav>
 
-            <div id="drinks" class="section" style="display: none;">
-                <h2>Ichimliklar</h2>
-                <div class="product">
-                    <img src="drink1.jpg" alt="Ichimlik 1">
-                    <h3>Choy</h3>
-                    <p>Narxi: 5,000 UZS</p>
-                    <button onclick="addToCart('Choy')">Korzinkaga qo'shish</button>
-                </div>
-            </div>
+        <section id="products-section" class="products hidden">
+            <!-- Mahsulotlar bu yerga qo'shiladi -->
+        </section>
 
-            <div id="fast_food" class="section" style="display: none;">
-                <h2>Fast Food</h2>
-                <div class="product">
-                    <img src="fast_food1.jpg" alt="Fast Food 1">
-                    <h3>Gamburger</h3>
-                    <p>Narxi: 15,000 UZS</p>
-                    <button onclick="addToCart('Gamburger')">Korzinkaga qo'shish</button>
-                </div>
-            </div>
-
-            <div id="national_food" class="section" style="display: none;">
-                <h2>Milliy Taomlar</h2>
-                <div class="product">
-                    <img src="national_food1.jpg" alt="Milliy Taom 1">
-                    <h3>Somsa</h3>
-                    <p>Narxi: 10,000 UZS</p>
-                    <button onclick="addToCart('Somsa')">Korzinkaga qo'shish</button>
-                </div>
-            </div>
-
-            <div id="alcohol" class="section" style="display: none;">
-                <h2>Spirtli Ichimliklar</h2>
-                <div class="product">
-                    <img src="alcohol1.jpg" alt="Spirtli Ichimlik 1">
-                    <h3>Votka</h3>
-                    <p>Narxi: 30,000 UZS</p>
-                    <button onclick="addToCart('Votka')">Korzinkaga qo'shish</button>
-                </div>
-            </div>
-        </main>
-
-        <footer>
-            <h2 id="ishtaha" style="display: none; animation: shake 0.5s infinite;">Ishtaha!</h2>
-            <button id="readyButton" style="display: none;" onclick="showIshtaha()">Tayyor</button>
-        </footer>
+        <!-- Savat va Tayyor tugmasi -->
+        <div id="cart-summary" class="hidden">
+            <p>Savat: <span id="cart-items">0</span> ta mahsulot</p>
+            <p>Jami summa: <span id="total-price">0</span> so'm</p>
+            <button id="checkout" class="hidden">Tayyor</button>
+        </div>
     </div>
-
-    <script>
-        let cartItems = [];
-
-        window.onload = function() {
-            document.getElementById('loader').style.display = 'none';
-            document.querySelector('.container').style.display = 'block';
-        };
-
-        function showSection(sectionId) {
-            var sections = document.querySelectorAll('.section');
-            sections.forEach(function(section) {
-                section.style.display = 'none';
-            });
-            document.getElementById(sectionId).style.display = 'block';
-            document.getElementById('ishtaha').style.display = 'none'; // Ishtaha ni yashirish
-            document.getElementById('readyButton').style.display = 'none'; // Tayyor tugmasini yashirish
-        }
-
-        function addToCart(item) {
-            cartItems.push(item);
-            document.getElementById('ishtaha').style.display = 'none'; // Har safar qo'shganda yashirish
-            document.getElementById('readyButton').style.display = 'block'; // Tayyor tugmasini ko'rsatish
-        }
-
-        function showIshtaha() {
-            document.getElementById('ishtaha').style.display = 'block'; // Ishtaha ni ko'rsatish
-            document.getElementById('readyButton').style.display = 'none'; // Tayyor tugmasini yashirish
-            cartItems = []; // Korzinka tozalanadi
-        }
-    </script>
 </body>
 </html>
-
