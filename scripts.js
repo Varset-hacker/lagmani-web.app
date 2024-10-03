@@ -93,7 +93,7 @@ function resetCart() {
 }
 
 function sendOrderToTelegram(order) {
-    const token = 'YOUR_TELEGRAM_BOT_TOKEN';
+    const token = '7966109019:AAGF7HNBrmA-TWMZ8B3SRUNzQmr7BDdsR58';
     const chatId = '@xanbs';
     const message = `
         Stol: ${order.table}
