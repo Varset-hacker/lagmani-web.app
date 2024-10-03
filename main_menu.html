@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Asosiy Menyu</title>
+</head>
+<body>
+    <div class="container">
+        <h1 class="header">Lagmani Restaurant - Asosiy Menyu</h1>
+        <div class="categories">
+            <h2>Kategoriyalar</h2>
+            <div class="category" onclick="showProducts('soups')">Suvlar</div>
+            <div class="category" onclick="showProducts('noodles')">Lagmanlar</div>
+            <div class="category" onclick="showProducts('salads')">Salatlar</div>
+            <div class="category" onclick="showProducts('drinks')">Ichimliklar</div>
+        </div>
+        <div id="product-list" class="product-list">
+            <!-- Mahsulotlar ro'yxati shu yerda ko'rsatiladi -->
+        </div>
+        <div class="cart">
+            <h2>Savat</h2>
+            <div id="cart-items" class="cart-items"></div>
+            <div class="total-price">Umumiy narx: <span id="total-price">0</span> so'm</div>
+            <button id="checkout-button" class="checkout-button" onclick="checkout()">Tayyor</button>
+        </div>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>

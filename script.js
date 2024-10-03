@@ -1,33 +1,54 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const loadingScreen = document.getElementById('loading-screen');
-    const tableSelection = document.getElementById('table-selection');
+// Yuklanish ekranini ko'rsatish
+document.addEventListener("DOMContentLoaded", function() {
+    const loadingOverlay = document.getElementById('loading');
     const mainContent = document.getElementById('main-content');
-    const confirmation = document.getElementById('confirmation');
-    const selectedTableText = document.getElementById('selected-table-text');
-    const selectTableButton = document.getElementById('select-table');
-    const continueToMainButton = document.getElementById('continue-to-main');
 
-    // Sahifa yuklanganda yuklanish animatsiyasi 3 soniya davom etadi
-    setTimeout(() => {
-        loadingScreen.style.display = 'none';
-        tableSelection.classList.remove('hidden');
-    }, 3000);
-
-    // Stol tanlangandan keyin tasdiqlash sahifasiga o'tish
-    selectTableButton.addEventListener('click', () => {
-        const selectedTable = document.getElementById('table-select').value;
-        if (selectedTable) {
-            tableSelection.classList.add('hidden');
-            selectedTableText.textContent = `Tanlangan stol: ${selectedTable}`;
-            confirmation.classList.remove('hidden');
-        } else {
-            alert("Iltimos, stol raqamini tanlang!");
-        }
-    });
-
-    // Asosiy menyuga o'tish
-    continueToMainButton.addEventListener('click', () => {
-        confirmation.classList.add('hidden');
-        mainContent.classList.remove('hidden');
-    });
+    // 2 soniya davomida yuklanish ekranini ko'rsatish
+    setTimeout(function() {
+        loadingOverlay.style.display = 'none';
+        mainContent.style.display = 'flex';
+    }, 2000);
 });
+
+// Stolni tanlash va tasdiqlash funksiyasi
+function confirmTable() {
+    const select = document.getElementById("table-number");
+    const selectedTable = select.options[select.selectedIndex].text;
+    const confirmationMessage = document.getElementById("confirmation-message");
+
+    if (selectedTable) {
+        confirmationMessage.textContent = `Siz tanlagan stol: ${selectedTable}`;
+        confirmationMessage.style.display = 'block';
+
+        // Stol tanlanganidan so'ng, tanlov bo'limini yashirish
+        document.getElementById("table-selection").style.display = 'none';
+
+        // Yana asosiy menyuga o'tish, bu yerda animatsiya kiritishingiz mumkin
+        setTimeout(() => {
+            window.location.href = 'main_menu.html'; // Asosiy menyu sahifangizga yo'naltirish
+        }, 3000); // 3 soniyadan keyin o'tish
+    } else {
+        alert("Iltimos, stolni tanlang!");
+    }
+}
+
+// Tilni o'zgartirish funksiyasi
+function changeLanguage() {
+    const languageSelector = document.getElementById("language");
+    const selectedLanguage = languageSelector.value;
+    // Tilni o'zgartirish logikasini yozing
+    // Tarjima qismlarini o'zgartirish kerak bo'ladi
+    if (selectedLanguage === "uz") {
+        document.querySelector("h1").textContent = "Lagmani Restaurant";
+        document.querySelector("#table-selection label").textContent = "Stolni tanlang:";
+        document.querySelector("#continue-button").textContent = "Davom etish";
+    } else if (selectedLanguage === "ru") {
+        document.querySelector("h1").textContent = "Ресторан Лагмани";
+        document.querySelector("#table-selection label").textContent = "Выберите стол:";
+        document.querySelector("#continue-button").textContent = "Продолжить";
+    } else if (selectedLanguage === "en") {
+        document.querySelector("h1").textContent = "Lagmani Restaurant";
+        document.querySelector("#table-selection label").textContent = "Select a table:";
+        document.querySelector("#continue-button").textContent = "Continue";
+    }
+}

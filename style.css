@@ -1,27 +1,31 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f9f3d4;
-    color: #333;
+    background-color: #f8f1e7;
     margin: 0;
     padding: 0;
 }
 
-#loading-screen {
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     flex-direction: column;
-    height: 100vh;
-    background-color: #f9f3d4;
+    z-index: 10;
 }
 
-.spinner {
+.loading-spinner {
     border: 8px solid #f3f3f3; /* Light grey */
-    border-top: 8px solid #3498db; /* Blue */
+    border-top: 8px solid #f9d44d; /* Yellow */
     border-radius: 50%;
     width: 50px;
     height: 50px;
-    animation: spin 2s linear infinite;
+    animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
@@ -29,38 +33,74 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-.hidden {
-    display: none;
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
 }
 
-#table-selection {
-    text-align: center;
-    margin-top: 50px;
+.header {
+    font-size: 3em;
+    color: #f9d44d;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px #f6c4a5;
 }
 
-#main-content {
+.language-selector {
+    margin-bottom: 20px;
+}
+
+.table-selection {
+    background: #fff3e6;
+    border: 2px solid #f9d44d;
     padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
 }
 
-#confirmation {
-    text-align: center;
-    margin-top: 50px;
+.table-selection:hover {
+    transform: scale(1.05);
 }
 
-button {
-    background-color: #ffcc00; /* Yellow */
-    color: #fff;
+#table-number {
+    margin: 10px 0;
+    padding: 10px;
+    border: 2px solid #f9d44d;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+#continue-button {
+    background-color: #f9d44d;
     border: none;
     padding: 10px 20px;
+    color: white;
+    font-size: 1.2em;
     cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
 }
 
-button:hover {
-    background-color: #e0a800;
+#continue-button:hover {
+    background-color: #f6c4a5;
 }
 
-#selected-table-text {
-    margin: 20px 0;
+.confirmation-message {
+    margin-top: 20px;
+    font-size: 1.5em;
+    color: #4caf50;
+    animation: fadeIn 0.5s ease-in-out;
+    text-align: center;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
