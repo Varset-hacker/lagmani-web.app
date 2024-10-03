@@ -1,5 +1,6 @@
 let cart = [];
 let total = 0;
+let selectedTable = null; // Tanlangan stol
 
 function showProducts(category) {
     const productList = document.getElementById("product-list");
@@ -20,7 +21,7 @@ function showProducts(category) {
     } else if (category === 'salads') {
         products = [
             { name: 'Salat olma', price: 10000 },
-            { name: 'O\'zbek salati', price: 15000 }
+            { name: 'Ozbek salati', price: 15000 }
         ];
     } else if (category === 'drinks') {
         products = [
@@ -70,11 +71,17 @@ function updateCart() {
 }
 
 function checkout() {
+    selectedTable = document.getElementById("table-number").value; // Tanlangan stol raqamini olish
+
+    if (!selectedTable) {
+        alert("Iltimos, stol raqamini tanlang!");
+        return;
+    }
+
     const paymentMethod = prompt("To'lov usulini tanlang: Naqd pul yoki Karta");
-    const tableNumber = prompt("Stol raqamini kiriting (1-80):");
 
     const orderDetails = {
-        table: tableNumber,
+        table: selectedTable,
         items: cart,
         total,
         paymentMethod
@@ -88,12 +95,13 @@ function checkout() {
 function resetCart() {
     cart = [];
     total = 0;
+    document.getElementById("table-number").value = ""; // Stol raqamini tozalash
     updateCart();
     document.getElementById("product-list").innerHTML = ""; // Mahsulotlar ro'yxatini tozalang
 }
 
 function sendOrderToTelegram(order) {
-    const token = '7966109019:AAGF7HNBrmA-TWMZ8B3SRUNzQmr7BDdsR58';
+    const token = '7966109019:AAGF7HNBrmA-TWMZ8B3SRUNzQmr7BDdsR58'; // Bot tokenini o'rnatish
     const chatId = '@xanbs';
     const message = `
         Stol: ${order.table}
@@ -103,8 +111,12 @@ function sendOrderToTelegram(order) {
     `;
 
     const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+    console.log('https://t.me/xanbs:', url); // Yuborilayotgan URL ni ko'rsatish
     fetch(url)
-        .then(response => response.json())
-        .then(data => console.log(data))
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(data => console.log('Xabar yuborildi:', data))
         .catch(error => console.error('Xato:', error));
 }
