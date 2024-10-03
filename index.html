@@ -19,7 +19,6 @@
         <h1>Stolni tanlang</h1>
         <select id="table-select">
             <option value="" disabled selected>Stol raqamini tanlang</option>
-            <!-- 1-80 gacha stol raqamlari -->
             <script>
                 for (let i = 1; i <= 80; i++) {
                     document.write(`<option value="${i}">${i}-stol</option>`);
@@ -47,19 +46,22 @@
             <button class="category" data-category="salatlar">Salatlar</button>
             <button class="category" data-category="ichimliklar">Ichimliklar</button>
             <button class="category" data-category="asosiy-taomlar">Asosiy taomlar</button>
-            <!-- Yana kategoriyalar -->
         </nav>
 
         <section id="products-section" class="products hidden">
             <!-- Mahsulotlar bu yerga qo'shiladi -->
         </section>
 
-        <!-- Savat va Tayyor tugmasi -->
         <div id="cart-summary" class="hidden">
             <p>Savat: <span id="cart-items">0</span> ta mahsulot</p>
             <p>Jami summa: <span id="total-price">0</span> so'm</p>
             <button id="checkout" class="hidden">Tayyor</button>
         </div>
+    </div>
+
+    <div id="confirmation" class="hidden">
+        <h2 id="selected-table-text"></h2>
+        <button id="continue-to-main">Asosiy menyuga o'tish</button>
     </div>
 </body>
 </html>
