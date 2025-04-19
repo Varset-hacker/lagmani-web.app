@@ -1,44 +1,271 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Lagmani Restaurant</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketplace Web App</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.20.6/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"></script>
 </head>
 <body>
-    <div class="loading-overlay" id="loading">
-        <div class="loading-spinner"></div>
-        <p>Yuklanmoqda...</p>
-    </div>
-    <div class="container" id="main-content" style="display: none;">
-        <h1 class="header">Lagmani Restaurant</h1>
-        <div class="language-selector">
-            <label for="language">Tilni tanlang:</label>
-            <select id="language" onchange="changeLanguage()">
-                <option value="uz">O'zbekcha</option>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Firebase konfiguratsiyasi
+    const firebaseConfig = {
+      apiKey: "AIzaSyAU13diPTWnh0tqONP9jMi5Z1Wb6d0hbR8",
+      authDomain: "marketplace-app-7c1bc.firebaseapp.com",
+      projectId: "marketplace-app-7c1bc",
+      storageBucket: "marketplace-app-7c1bc.firebasestorage.app",
+      messagingSenderId: "597174503691",
+      appId: "1:597174503691:web:92e2c03c35c5e9fad7ba0e",
+      measurementId: "G-14HR7LFVK1"
+    };
+
+    // Firebase’ni ishga tushirish
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // Asosiy komponent
+    function App() {
+      const [user, setUser] = useState(null);
+      const [phone, setPhone] = useState('');
+      const [code, setCode] = useState('');
+      const [confirmationResult, setConfirmationResult] = useState(null);
+      const [products, setProducts] = useState([]);
+      const [language, setLanguage] = useState('uz');
+      const [newProduct, setNewProduct] = useState({ name: '', price: '', image: null });
+      const [order, setOrder] = useState({ productId: '', address: '' });
+      const [isAdmin, setIsAdmin] = useState(false);
+
+      useEffect(() => {
+        auth.onAuthStateChanged(async (user) => {
+          setUser(user);
+          if (user) {
+            // Admin tekshiruvi (masalan, faqat @xanbs uchun)
+            const adminPhone = '+998901234567'; // Bu yerga @xanbs telefon raqamini qo‘ying
+            setIsAdmin(user.phoneNumber === adminPhone);
+            // Mahsulotlarni yuklash
+            const response = await fetch('http://localhost:3000/products');
+            const data = await response.json();
+            setProducts(data);
+          }
+        });
+      }, []);
+
+      const handlePhoneLogin = async (e) => {
+        e.preventDefault();
+        try {
+          const recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            size: 'invisible'
+          });
+          const result = await auth.signInWithPhoneNumber(phone, recaptchaVerifier);
+          setConfirmationResult(result);
+          alert('SMS kod yuborildi!');
+        } catch (error) {
+          alert('Xato: ' + error.message);
+        }
+      };
+
+      const handleCodeVerification = async (e) => {
+        e.preventDefault();
+        try {
+          await confirmationResult.confirm(code);
+          setPhone('');
+          setCode('');
+          setConfirmationResult(null);
+        } catch (error) {
+          alert('Xato: ' + error.message);
+        }
+      };
+
+      const handleAddProduct = async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('name', newProduct.name);
+        formData.append('price', newProduct.price);
+        formData.append('image', newProduct.image);
+
+        await fetch('http://localhost:3000/add-product', {
+          method: 'POST',
+          body: formData
+        });
+        setNewProduct({ name: '', price: '', image: null });
+        const response = await fetch('http://localhost:3000/products');
+        setProducts(await response.json());
+      };
+
+      const handleOrder = async (e) => {
+        e.preventDefault();
+        const product = products.find(p => p.id === order.productId);
+        await fetch('http://localhost:3000/order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productId: order.productId,
+            productName: product.name,
+            price: product.price,
+            address: order.address,
+            userPhone: user.phoneNumber
+          })
+        });
+        alert('Buyurtma yuborildi!');
+        setOrder({ productId: '', address: '' });
+      };
+
+      const translations = {
+        uz: { welcome: 'Xush kelibsiz', addProduct: 'Mahsulot qo‘shish', catalog: 'Katalog', order: 'Buyurtma berish' },
+        ru: { welcome: 'Добро пожаловать', addProduct: 'Добавить продукт', catalog: 'Каталог', order: 'Сделать заказ' },
+        en: { welcome: 'Welcome', addProduct: 'Add Product', catalog: 'Catalog', order: 'Place Order' }
+      };
+
+      return (
+        <div className="min-h-screen bg-gray-100">
+          <header className="bg-blue-600 text-white p-4">
+            <div className="container mx-auto flex justify-between items-center">
+              <h1 className="text-2xl font-bold">Marketplace</h1>
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="bg-white text-black p-2 rounded"
+              >
+                <option value="uz">O‘zbek</option>
                 <option value="ru">Русский</option>
                 <option value="en">English</option>
-            </select>
+              </select>
+              {user ? (
+                <button
+                  onClick={() => auth.signOut()}
+                  className="bg-red-500 px-4 py-2 rounded"
+                >
+                  Chiqish
+                </button>
+              ) : (
+                <div id="recaptcha-container"></div>
+              )}
+            </div>
+          </header>
+          <main className="container mx-auto p-4">
+            <h2 className="text-3xl font-bold mb-4">{translations[language].welcome}</h2>
+            {!user ? (
+              <div>
+                <form onSubmit={handlePhoneLogin} className="mb-4">
+                  <input
+                    type="tel"
+                    placeholder="+998901234567"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="border p-2 mb-2 w-full"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    className="bg-green-500 text-white px-4 py-2 rounded"
+                  >
+                    SMS yuborish
+                  </button>
+                </form>
+                {confirmationResult && (
+                  <form onSubmit={handleCodeVerification}>
+                    <input
+                      type="text"
+                      placeholder="SMS kod"
+                      value={code}
+                      onChange={(e) => setCode(e.target.value)}
+                      className="border p-2 mb-2 w-full"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className="bg-blue-500 text-white px-4 py-2 rounded"
+                    >
+                      Tasdiqlash
+                    </button>
+                  </form>
+                )}
+              </div>
+            ) : (
+              <div>
+                {isAdmin && (
+                  <form onSubmit={handleAddProduct} className="mb-8">
+                    <input
+                      type="text"
+                      placeholder="Mahsulot nomi"
+                      value={newProduct.name}
+                      onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+                      className="border p-2 mb-2 w-full"
+                      required
+                    />
+                    <input
+                      type="number"
+                      placeholder="Narxi"
+                      value={newProduct.price}
+                      onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+                      className="border p-2 mb-2 w-full"
+                      required
+                    />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setNewProduct({ ...newProduct, image: e.target.files[0] })}
+                      className="border p-2 mb-2 w-full"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className="bg-blue-500 text-white px-4 py-2 rounded"
+                    >
+                      {translations[language].addProduct}
+                    </button>
+                  </form>
+                )}
+                <h3 className="text-2xl font-bold mb-4">{translations[language].catalog}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {products.map((product) => (
+                    <div key={product.id} className="border p-4 rounded shadow">
+                      <img src={`/images/${product.image}`} alt={product.name} className="w-full h-48 object-cover mb-2" />
+                      <h4 className="text-xl font-bold">{product.name}</h4>
+                      <p>{product.price} UZS</p>
+                      <button
+                        onClick={() => setOrder({ ...order, productId: product.id })}
+                        className="bg-green-500 text-white px-4 py-2 rounded mt-2"
+                      >
+                        {translations[language].order}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                {order.productId && (
+                  <form onSubmit={handleOrder} className="mt-8">
+                    <input
+                      type="text"
+                      placeholder="Manzil"
+                      value={order.address}
+                      onChange={(e) => setOrder({ ...order, address: e.target.value })}
+                      className="border p-2 mb-2 w-full"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className="bg-blue-500 text-white px-4 py-2 rounded"
+                    >
+                      Buyurtma yuborish
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
+          </main>
         </div>
-        <div id="table-selection" class="table-selection">
-            <label for="table-number">Stolni tanlang:</label>
-            <select id="table-number">
-                <option value="">1-stol</option>
-                <option value="2">2-stol</option>
-                <option value="3">3-stol</option>
-                <option value="4">4-stol</option>
-                <option value="5">5-stol</option>
-                <option value="6">6-stol</option>
-                <option value="7">7-stol</option>
-                <option value="8">8-stol</option>
-                <option value="9">9-stol</option>
-                <option value="10">10-stol</option>
-            </select>
-            <button id="continue-button" onclick="confirmTable()">Davom etish</button>
-        </div>
-        <div id="confirmation-message" class="confirmation-message" style="display: none;"></div>
-    </div>
-    <script src="script.js"></script>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
 </body>
 </html>
