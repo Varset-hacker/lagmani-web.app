@@ -15,8 +15,8 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-// Python backend URL (mahalliy server)
-const backendUrl = 'http://localhost:5000';
+// Python backend URL
+const backendUrl = 'http://127.0.0.1:5000';
 
 // Asosiy komponent
 function App() {
@@ -98,16 +98,19 @@ function App() {
       formData.append('image', newProduct.image);
 
       try {
-        await fetch(`${backendUrl}/add_product`, {
+        const response = await fetch(`${backendUrl}/add_product`, {
           method: 'POST',
           body: formData
         });
-        const response = await fetch(`${backendUrl}/products`);
-        const data = await response.json();
-        setProducts(data.products);
-        localStorage.setItem('products', JSON.stringify(data.products));
-        alert('Mahsulot qo‘shildi! Rasm D:\\Marketplace\\Images ga saqlandi.');
-        setNewProduct({ name: '', price: '', image: null });
+        const result = await response.json();
+        if (result.success) {
+          const updatedResponse = await fetch(`${backendUrl}/products`);
+          const data = await updatedResponse.json();
+          setProducts(data.products);
+          localStorage.setItem('products', JSON.stringify(data.products));
+          alert('Mahsulot qo‘shildi! Rasm D:\\Marketplace\\Images ga saqlandi.');
+          setNewProduct({ name: '', price: '', image: null });
+        }
       } catch (error) {
         alert('Xato: ' + error.message);
       }
@@ -130,16 +133,19 @@ function App() {
     };
 
     try {
-      await fetch(`${backendUrl}/order`, {
+      const response = await fetch(`${backendUrl}/order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)
       });
-      const orders = JSON.parse(localStorage.getItem('orders')) || [];
-      const updatedOrders = [...orders, { id: Date.now().toString(), ...orderData }];
-      localStorage.setItem('orders', JSON.stringify(updatedOrders));
-      alert('Buyurtma yuborildi! Ma’lumotlar D:\\Marketplace\\data.json ga saqlandi.');
-      setOrder({ productId: '', address: '' });
+      const result = await response.json();
+      if (result.success) {
+        const orders = JSON.parse(localStorage.getItem('orders')) || [];
+        const updatedOrders = [...orders, { id: Date.now().toString(), ...orderData }];
+        localStorage.setItem('orders', JSON.stringify(updatedOrders));
+        alert('Buyurtma yuborildi! Ma’lumotlar D:\\Marketplace\\data.json ga saqlandi.');
+        setOrder({ productId: '', address: '' });
+      }
     } catch (error) {
       alert('Xato: ' + error.message);
     }
@@ -255,7 +261,7 @@ function App() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {products.map((product) => (
                 <div key={product.id} className="bg-white p-4 rounded-lg shadow-lg hover-scale fade-in">
-                  <img src={`http://localhost:5000/images/${product.image}`} alt={product.name} className="w-full h-48 object-cover mb-3 rounded-lg" />
+                  <img src={`${backendUrl}/images/${product.image}`} alt={product.name} className="w-full h-48 object-cover mb-3 rounded-lg" />
                   <h4 className="text-xl font-bold text-gray-800">{product.name}</h4>
                   <p className="text-gray-600">{product.price} UZS</p>
                   <button
